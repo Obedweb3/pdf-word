@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SILVER PDF/WORD — Powered by Obed Tech Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --silver:      #C0C0C0;
+      --silver-light:#E8E8E8;
+      --silver-dark: #888;
+      --chrome:      #D4D4D4;
+      --bg:          #0A0A0F;
+      --bg2:         #111118;
+      --bg3:         #16161F;
+      --accent:      #7EB8F7;
+      --accent2:     #A8D4FF;
+      --gold:        #D4AF6A;
+      --white:       #F5F5F7;
+      --danger:      #FF6B6B;
+      --success:     #5BE08A;
+      --border:      rgba(192,192,192,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg);
+      color: var(--silver-light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity:0.35;
+    }
+
+    /* ── BACKGROUND GRID ── */
+    body::after {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(192,192,192,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(192,192,192,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* ── ANIMATED GLOWING ORB ── */
+    .orb {
+      position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:0;
+    }
+    .orb-1 { width:500px; height:500px; background:radial-gradient(circle,rgba(126,184,247,0.08),transparent 70%); top:-100px; left:-100px; animation:drift1 12s ease-in-out infinite alternate; }
+    .orb-2 { width:400px; height:400px; background:radial-gradient(circle,rgba(212,175,106,0.06),transparent 70%); bottom:-80px; right:-60px; animation:drift2 15s ease-in-out infinite alternate; }
+    @keyframes drift1 { to { transform:translate(80px, 120px); } }
+    @keyframes drift2 { to { transform:translate(-60px, -80px); } }
+
+    /* ── HEADER ── */
+    header {
+      position:relative; z-index:10;
+      padding: 28px 40px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(10,10,15,0.9), transparent);
+      backdrop-filter: blur(12px);
+    }
+    .logo-block { display:flex; align-items:baseline; gap:10px; }
+    .logo-text {
+      font-family:'Cormorant Garamond', serif;
+      font-size:2rem; font-weight:300; letter-spacing:0.18em;
+      background: linear-gradient(135deg, #fff 0%, var(--silver) 40%, var(--chrome) 70%, #fff 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+      text-shadow: none;
+    }
+    .logo-slash { color:var(--accent); font-family:'Space Mono',monospace; font-size:1.1rem; opacity:0.7; }
+    .powered {
+      font-family:'Space Mono',monospace; font-size:0.62rem;
+      color:var(--silver-dark); letter-spacing:0.12em; text-transform:uppercase;
+    }
+    .powered span { color:var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      position:relative; z-index:5;
+      text-align:center; padding: 56px 24px 32px;
+    }
+    .hero-eyebrow {
+      font-family:'Space Mono',monospace; font-size:0.72rem;
+      letter-spacing:0.3em; color:var(--accent); text-transform:uppercase; margin-bottom:16px;
+    }
+    .hero-title {
+      font-family:'Cormorant Garamond',serif; font-size:clamp(2.6rem,6vw,4.8rem);
+      font-weight:300; line-height:1.1; letter-spacing:0.04em;
+      background: linear-gradient(160deg, #fff 20%, var(--silver) 60%, var(--chrome) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .hero-sub {
+      margin-top:16px; font-size:1.05rem; color:var(--silver-dark);
+      font-weight:400; letter-spacing:0.06em;
+    }
+
+    /* ── CARD ── */
+    .card-wrap {
+      position:relative; z-index:5;
+      max-width:780px; margin:0 auto; padding:0 20px 60px;
+      display:flex; flex-direction:column; gap:24px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(22,22,31,0.95), rgba(16,16,24,0.95));
+      border: 1px solid var(--border);
+      border-radius:16px;
+      padding:32px;
+      backdrop-filter:blur(20px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover { border-color: rgba(192,192,192,0.28); box-shadow:0 12px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07); }
+
+    /* ── MODE SWITCHER ── */
+    .mode-switcher {
+      display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    }
+    .mode-btn {
+      position:relative; cursor:pointer;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(192,192,192,0.1);
+      border-radius:12px; padding:20px 16px;
+      display:flex; align-items:center; gap:14px;
+      transition: all 0.25s; overflow:hidden;
+    }
+    .mode-btn::before {
+      content:''; position:absolute; inset:0; opacity:0;
+      background: linear-gradient(135deg, rgba(126,184,247,0.06), rgba(212,175,106,0.04));
+      transition:opacity 0.25s;
+    }
+    .mode-btn:hover::before, .mode-btn.active::before { opacity:1; }
+    .mode-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(126,184,247,0.12), inset 0 0 20px rgba(126,184,247,0.04);
+    }
+    .mode-icon {
+      width:44px; height:44px; border-radius:10px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.4rem;
+    }
+    .mode-btn.active .mode-icon { animation:iconPulse 2s ease-in-out infinite; }
+    @keyframes iconPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+    .mode-icon.pdf { background:linear-gradient(135deg,#FF6B6B22,#FF4E4E11); color:#FF7C7C; }
+    .mode-icon.word { background:linear-gradient(135deg,#7EB8F722,#4A9FE911); color:#7EB8F7; }
+    .mode-label { font-size:1rem; font-weight:600; letter-spacing:0.08em; color:var(--silver-light); }
+    .mode-desc { font-size:0.78rem; color:var(--silver-dark); letter-spacing:0.04em; margin-top:2px; }
+    .mode-badge {
+      margin-left:auto; font-family:'Space Mono',monospace; font-size:0.6rem;
+      padding:3px 8px; border-radius:4px; letter-spacing:0.1em;
+      background:rgba(126,184,247,0.1); color:var(--accent); border:1px solid rgba(126,184,247,0.2);
+    }
+
+    /* ── SECTION LABELS ── */
+    .section-label {
+      font-family:'Space Mono',monospace; font-size:0.68rem;
+      letter-spacing:0.2em; text-transform:uppercase; color:var(--silver-dark);
+      margin-bottom:12px; display:flex; align-items:center; gap:10px;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── API KEY INPUTS ── */
+    .api-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:540px){ .api-grid{ grid-template-columns:1fr; } .mode-switcher{ grid-template-columns:1fr; } }
+
+    .input-group { display:flex; flex-direction:column; gap:6px; }
+    .input-label { font-size:0.76rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--silver-dark); }
+    .input-field {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(192,192,192,0.12);
+      border-radius:8px; padding:11px 14px;
+      font-family:'Space Mono',monospace; font-size:0.78rem;
+      color:var(--silver-light); outline:none; width:100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(126,184,247,0.08); }
+    .input-field::placeholder { color:rgba(192,192,192,0.25); }
+
+    /* ── DROP ZONE ── */
+    .drop-zone {
+      border: 2px dashed rgba(192,192,192,0.15);
+      border-radius:12px; padding:48px 24px;
+      text-align:center; cursor:pointer; position:relative;
+      background: rgba(255,255,255,0.015);
+      transition: all 0.3s;
+    }
+    .drop-zone.dragover {
+      border-color:var(--accent); background:rgba(126,184,247,0.04);
+      box-shadow:inset 0 0 40px rgba(126,184,247,0.06);
+    }
+    .drop-zone.has-file { border-color:var(--success); border-style:solid; background:rgba(91,224,138,0.03); }
+    .drop-icon { font-size:2.8rem; margin-bottom:12px; display:block; }
+    .drop-title { font-size:1.1rem; font-weight:600; letter-spacing:0.06em; color:var(--silver-light); }
+    .drop-sub { font-size:0.82rem; color:var(--silver-dark); margin-top:6px; letter-spacing:0.06em; }
+    .drop-file-name {
+      font-family:'Space Mono',monospace; font-size:0.78rem;
+      color:var(--success); margin-top:8px; word-break:break-all;
+    }
+    input[type="file"] { display:none; }
+
+    /* ── CONVERT BUTTON ── */
+    .convert-btn {
+      width:100%; padding:17px; border:none; border-radius:12px; cursor:pointer;
+      font-family:'Rajdhani',sans-serif; font-size:1.05rem; font-weight:700;
+      letter-spacing:0.18em; text-transform:uppercase; position:relative; overflow:hidden;
+      background: linear-gradient(135deg, #C0C0C0 0%, #8A8A8A 50%, #C0C0C0 100%);
+      color:#0A0A0F;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+    }
+    .convert-btn::before {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(135deg,rgba(255,255,255,0.25),transparent 60%);
+      pointer-events:none;
+    }
+    .convert-btn:hover:not(:disabled) {
+      transform:translateY(-2px);
+      box-shadow:0 8px 30px rgba(0,0,0,0.5), 0 0 30px rgba(192,192,192,0.15);
+      background:linear-gradient(135deg,#D4D4D4 0%,#A0A0A0 50%,#D4D4D4 100%);
+    }
+    .convert-btn:active:not(:disabled) { transform:translateY(0); }
+    .convert-btn:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
+    .convert-btn.loading { animation: shimmer 1.2s linear infinite; }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    .convert-btn.loading-active {
+      background: linear-gradient(90deg, #888 0%, #C0C0C0 30%, #D4D4D4 50%, #C0C0C0 70%, #888 100%);
+      background-size:200% auto;
+      animation: shimmer 1.2s linear infinite;
+    }
+
+    /* ── STATUS ── */
+    .status-bar {
+      border-radius:10px; padding:14px 18px;
+      font-family:'Space Mono',monospace; font-size:0.78rem; letter-spacing:0.06em;
+      display:none; align-items:center; gap:12px;
+    }
+    .status-bar.show { display:flex; animation:fadeSlide 0.3s ease; }
+    @keyframes fadeSlide { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .status-bar.info    { background:rgba(126,184,247,0.08); border:1px solid rgba(126,184,247,0.2); color:var(--accent2); }
+    .status-bar.success { background:rgba(91,224,138,0.08);  border:1px solid rgba(91,224,138,0.25); color:var(--success); }
+    .status-bar.error   { background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.25); color:var(--danger); }
+    .spinner { width:16px;height:16px;border:2px solid rgba(126,184,247,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── DOWNLOAD AREA ── */
+    .download-area { display:none; }
+    .download-area.show { display:block; animation:fadeSlide 0.4s ease; }
+    .download-btn {
+      width:100%; padding:15px; border:none; border-radius:12px; cursor:pointer;
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      letter-spacing:0.16em; text-transform:uppercase;
+      background:linear-gradient(135deg,rgba(91,224,138,0.15),rgba(91,224,138,0.08));
+      color:var(--success); border:1.5px solid rgba(91,224,138,0.3);
+      transition:all 0.25s; text-decoration:none; display:block; text-align:center;
+      margin-top:14px;
+    }
+    .download-btn:hover { background:linear-gradient(135deg,rgba(91,224,138,0.22),rgba(91,224,138,0.12)); box-shadow:0 0 20px rgba(91,224,138,0.12); transform:translateY(-1px); }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap { height:3px; background:rgba(192,192,192,0.08); border-radius:2px; overflow:hidden; display:none; }
+    .progress-wrap.show { display:block; }
+    .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--silver)); border-radius:2px; transition:width 0.4s ease; }
+
+    /* ── FOOTER ── */
+    footer {
+      position:relative; z-index:5;
+      text-align:center; padding:32px 24px 40px;
+      border-top:1px solid var(--border);
+    }
+    .footer-logo {
+      font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:300; letter-spacing:0.2em;
+      background:linear-gradient(135deg,#fff,var(--silver));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .footer-powered {
+      margin-top:6px; font-family:'Space Mono',monospace; font-size:0.62rem;
+      color:var(--silver-dark); letter-spacing:0.14em; text-transform:uppercase;
+    }
+    .footer-powered span { color:var(--gold); }
+    .footer-note { margin-top:14px; font-size:0.76rem; color:rgba(136,136,136,0.5); letter-spacing:0.04em; }
+
+    /* ── DIVIDER ── */
+    .divider { height:1px; background:var(--border); margin:8px 0; }
+
+    /* ── STEP INDICATORS ── */
+    .steps {
+      display:flex; align-items:center; gap:0; margin-bottom:8px;
+    }
+    .step { display:flex; align-items:center; gap:8px; flex:1; }
+    .step-num {
+      width:26px; height:26px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Space Mono',monospace; font-size:0.68rem;
+      background:rgba(192,192,192,0.08); border:1px solid rgba(192,192,192,0.15);
+      color:var(--silver-dark); flex-shrink:0; transition:all 0.3s;
+    }
+    .step.active .step-num { background:var(--accent); border-color:var(--accent); color:#0A0A0F; }
+    .step.done .step-num { background:var(--success); border-color:var(--success); color:#0A0A0F; }
+    .step-label { font-size:0.76rem; letter-spacing:0.08em; color:var(--silver-dark); transition:color 0.3s; }
+    .step.active .step-label, .step.done .step-label { color:var(--silver-light); }
+    .step-line { width:28px; height:1px; background:var(--border); flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-block">
+    <span class="logo-text">SILVER</span>
+    <span class="logo-slash">◈</span>
+    <span class="logo-text">PDF · WORD</span>
+  </div>
+  <div class="powered">Powered by <span>Obed Tech Developer</span></div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">✦ Professional Document Conversion ✦</div>
+  <h1 class="hero-title">Transform Your<br/>Documents Instantly</h1>
+  <p class="hero-sub">PDF ⟶ Word &nbsp;·&nbsp; Word ⟶ PDF &nbsp;·&nbsp; Lightning Fast &nbsp;·&nbsp; Powered by iLovePDF</p>
+</div>
+
+<!-- MAIN CARD -->
+<div class="card-wrap">
+
+  <!-- STEP INDICATOR -->
+  <div style="display:flex;align-items:center;padding:0 4px;" id="stepBar">
+    <div class="step active" id="step1"><div class="step-num">1</div><div class="step-label">Choose Mode</div></div>
+    <div class="step-line"></div>
+    <div class="step" id="step2"><div class="step-num">2</div><div class="step-label">Upload File</div></div>
+    <div class="step-line"></div>
+    <div class="step" id="step3"><div class="step-num">3</div><div class="step-label">Convert</div></div>
+  </div>
+
+  <!-- MODE SELECTION -->
+  <div class="card">
+    <div class="section-label">Conversion Mode</div>
+    <div class="mode-switcher">
+      <div class="mode-btn active" id="modePdfToWord" onclick="setMode('pdf-to-word')">
+        <div class="mode-icon pdf">📄</div>
+        <div>
+          <div class="mode-label">PDF → Word</div>
+          <div class="mode-desc">Convert PDF to editable DOCX</div>
+        </div>
+        <div class="mode-badge">DOCX</div>
+      </div>
+      <div class="mode-btn" id="modeWordToPdf" onclick="setMode('word-to-pdf')">
+        <div class="mode-icon word">📝</div>
+        <div>
+          <div class="mode-label">Word → PDF</div>
+          <div class="mode-desc">Convert DOCX to PDF format</div>
+        </div>
+        <div class="mode-badge">PDF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="card">
+    <div class="section-label" id="uploadLabel">Upload PDF File</div>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" 
+         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <span class="drop-icon" id="dropIcon">📂</span>
+      <div class="drop-title" id="dropTitle">Drop your file here or click to browse</div>
+      <div class="drop-sub" id="dropSub">Supports PDF files up to 50MB</div>
+      <div class="drop-file-name" id="dropFileName"></div>
+    </div>
+    <input type="file" id="fileInput" accept=".pdf" onchange="handleFileSelect(event)"/>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar" id="statusBar">
+    <div class="spinner" id="statusSpinner"></div>
+    <span id="statusText">Processing...</span>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- CONVERT BUTTON -->
+  <button class="convert-btn" id="convertBtn" onclick="startConversion()">
+    ⟳ &nbsp; Convert Document
+  </button>
+
+  <!-- DOWNLOAD -->
+  <div class="download-area" id="downloadArea">
+    <div class="card">
+      <div class="section-label">Conversion Complete</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <span style="font-size:1.8rem;">✅</span>
+        <div>
+          <div style="font-size:1rem;font-weight:600;color:var(--success);letter-spacing:0.06em;">File Ready!</div>
+          <div style="font-size:0.8rem;color:var(--silver-dark);" id="downloadInfo">Your converted file is ready to download.</div>
+        </div>
+      </div>
+      <a class="download-btn" id="downloadLink" href="#" download>
+        ↓ &nbsp; Download Converted File
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">SILVER PDF · WORD</div>
+  <div class="footer-powered">Powered by <span>Obed Tech Developer</span></div>
+  <div class="footer-note">Conversion technology provided by iLovePDF API &nbsp;·&nbsp; &copy; 2025 Obed Tech Developer</div>
+</footer>
+
+<script>
+  // ── WORKER URL — set this after deploying cloudflare-worker.js ──
+  // e.g. 'https://silver-pdf.YOUR-NAME.workers.dev'
+  const WORKER_URL = 'https://silver-pdf-proxy.obedtech.workers.dev';
+
+  // ── STATE ──
+  let currentMode = 'pdf-to-word';
+  let selectedFile = null;
+
+  // ── FILE → BASE64 ──
+  function fileToBase64(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload  = () => res(r.result.split(',')[1]);
+      r.onerror = () => rej(new Error('File read failed'));
+      r.readAsDataURL(file);
+    });
+  }
+
+  // ── CONVERSION ──
+  async function startConversion() {
+    if (!selectedFile) { showStatus('error', '⚠ Please select a file to convert.'); return; }
+
+    const btn = document.getElementById('convertBtn');
+    btn.disabled = true;
+    btn.classList.add('loading-active');
+    btn.textContent = '⟳  Converting...';
+    hideDownload();
+    clearStatus();
+    updateSteps(3);
+
+    try {
+      showProgress(15);
+      showStatus('info', '📤 Reading file...');
+      const fileBase64 = await fileToBase64(selectedFile);
+
+      showProgress(35);
+      showStatus('info', '⚙ Converting via server...');
+
+      const tool = currentMode === 'pdf-to-word' ? 'pdftoword' : 'officepdf';
+
+      const res = await fetch(WORKER_URL + '/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool, fileName: selectedFile.name, fileBase64 }),
+      });
+
+      if (!res.ok) {
+        let msg = 'Conversion failed (' + res.status + ')';
+        try { const j = await res.json(); msg = j.error || msg; } catch {}
+        throw new Error(msg);
+      }
+
+      showProgress(85);
+      showStatus('info', '📥 Preparing download...');
+
+      const blob = await res.blob();
+      showProgress(100);
+
+      const ext  = currentMode === 'pdf-to-word' ? 'docx' : 'pdf';
+      const base = selectedFile.name.replace(/\.[^.]+$/, '');
+      const url  = URL.createObjectURL(blob);
+      const link = document.getElementById('downloadLink');
+      link.href     = url;
+      link.download = base + '_converted.' + ext;
+      document.getElementById('downloadInfo').textContent =
+        base + '_converted.' + ext + '  (' + formatSize(blob.size) + ')';
+
+      showStatus('success', '✅ Done! Your converted file is ready.');
+      showDownload();
+
+    } catch (err) {
+      console.error(err);
+      showStatus('error', '✖ ' + err.message);
+      hideProgress();
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading-active');
+      btn.textContent = '⟳  Convert Document';
+    }
+  }
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('modePdfToWord').classList.toggle('active', mode === 'pdf-to-word');
+    document.getElementById('modeWordToPdf').classList.toggle('active', mode === 'word-to-pdf');
+
+    const fileInput = document.getElementById('fileInput');
+    const uploadLabel = document.getElementById('uploadLabel');
+    const dropSub = document.getElementById('dropSub');
+
+    if (mode === 'pdf-to-word') {
+      fileInput.accept = '.pdf';
+      uploadLabel.childNodes[0].textContent = 'Upload PDF File';
+      dropSub.textContent = 'Supports PDF files up to 50MB';
+    } else {
+      fileInput.accept = '.docx,.doc';
+      uploadLabel.childNodes[0].textContent = 'Upload Word File';
+      dropSub.textContent = 'Supports DOCX/DOC files up to 50MB';
+    }
+
+    // reset file
+    selectedFile = null;
+    resetDropZone();
+    hideDownload();
+    clearStatus();
+    updateSteps(1);
+  }
+
+  // ── FILE HANDLING ──
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.add('dragover');
+  }
+  function handleDragLeave(e) {
+    document.getElementById('dropZone').classList.remove('dragover');
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  }
+  function processFile(file) {
+    const validPdf  = currentMode === 'pdf-to-word' && file.type === 'application/pdf';
+    const validWord = currentMode === 'word-to-pdf' && (file.name.endsWith('.docx') || file.name.endsWith('.doc'));
+    if (!validPdf && !validWord) {
+      showStatus('error', '⚠ Invalid file type. Please upload a ' + (currentMode === 'pdf-to-word' ? 'PDF' : 'DOCX/DOC') + ' file.');
+      return;
+    }
+    selectedFile = file;
+    const zone = document.getElementById('dropZone');
+    zone.classList.add('has-file');
+    document.getElementById('dropIcon').textContent = '✅';
+    document.getElementById('dropTitle').textContent = 'File Selected';
+    document.getElementById('dropFileName').textContent = file.name + ' (' + formatSize(file.size) + ')';
+    clearStatus();
+    hideDownload();
+    updateSteps(2);
+  }
+  function resetDropZone() {
+    const zone = document.getElementById('dropZone');
+    zone.classList.remove('has-file','dragover');
+    document.getElementById('dropIcon').textContent = '📂';
+    document.getElementById('dropTitle').textContent = 'Drop your file here or click to browse';
+    document.getElementById('dropFileName').textContent = '';
+    document.getElementById('fileInput').value = '';
+  }
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1048576).toFixed(1) + ' MB';
+  }
+
+  // ── CONVERSION ──
+  async function startConversion() {
+    if (!selectedFile) { showStatus('error', '⚠ Please select a file to convert.'); return; }
+
+    const btn = document.getElementById('convertBtn');
+    btn.disabled = true;
+    btn.classList.add('loading-active');
+    btn.textContent = '⟳  Converting...';
+    hideDownload();
+    clearStatus();
+    updateSteps(3);
+
+    try {
+      showProgress(10);
+      showStatus('info', '🔐 Generating secure token...');
+      const token = await generateJWT(PUBLIC_KEY, SECRET_KEY);
+
+      // pdftoword = PDF→Word   |   officepdf = Word/Office→PDF
+      const toolName = currentMode === 'pdf-to-word' ? 'pdftoword' : 'officepdf';
+
+      showProgress(20);
+      showStatus('info', '⚙ Starting conversion task...');
+      const { server, task } = await apiStart(token, toolName);
+
+      showProgress(40);
+      showStatus('info', '📤 Uploading your file...');
+      const serverFilename = await apiUpload(token, server, task, selectedFile);
+
+      showProgress(65);
+      showStatus('info', '⚙ Processing...');
+      await apiProcess(token, server, task, toolName, serverFilename, selectedFile.name);
+
+      showProgress(85);
+      showStatus('info', '📥 Downloading result...');
+      const blob = await apiDownload(token, server, task);
+
+      showProgress(100);
+
+      const ext  = currentMode === 'pdf-to-word' ? 'docx' : 'pdf';
+      const base = selectedFile.name.replace(/\.[^.]+$/, '');
+      const url  = URL.createObjectURL(blob);
+      const link = document.getElementById('downloadLink');
+      link.href     = url;
+      link.download = base + '_converted.' + ext;
+      document.getElementById('downloadInfo').textContent =
+        base + '_converted.' + ext + '  (' + formatSize(blob.size) + ')';
+
+      showStatus('success', '✅ Done! Your converted file is ready.');
+      showDownload();
+
+    } catch (err) {
+      console.error(err);
+      showStatus('error', '✖ ' + (err.message || 'Conversion failed. Please try again.'));
+      hideProgress();
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading-active');
+      btn.textContent = '⟳  Convert Document';
+    }
+  }
+
+  // ── UI HELPERS ──
+  function showStatus(type, msg) {
+    const bar = document.getElementById('statusBar');
+    bar.className = 'status-bar show ' + type;
+    bar.querySelector('#statusSpinner').style.display = type === 'info' ? 'block' : 'none';
+    document.getElementById('statusText').textContent = msg;
+  }
+  function clearStatus() {
+    document.getElementById('statusBar').className = 'status-bar';
+  }
+  function showDownload() {
+    document.getElementById('downloadArea').classList.add('show');
+  }
+  function hideDownload() {
+    document.getElementById('downloadArea').classList.remove('show');
+  }
+  function showProgress(pct) {
+    document.getElementById('progressWrap').classList.add('show');
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+  function hideProgress() {
+    document.getElementById('progressWrap').classList.remove('show');
+    document.getElementById('progressFill').style.width = '0%';
+  }
+  function updateSteps(active) {
+    for (let i = 1; i <= 3; i++) {
+      const s = document.getElementById('step' + i);
+      s.classList.remove('active','done');
+      if (i < active) s.classList.add('done');
+      else if (i === active) s.classList.add('active');
+    }
+  }
+
+  // ── INIT ──
+  updateSteps(1);
+</script>
+</body>
+</html>
