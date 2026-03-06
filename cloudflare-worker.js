@@ -15,14 +15,23 @@ const CORS = {
 };
 
 // ── JWT HELPERS ──
+/**
+ * Converts a string to a base64 URL-safe format.
+ */
 function b64url(str) {
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+/**
+ * Converts an array of bytes to a base64 URL-safe string.
+ */
 function b64urlBytes(arr) {
   let s = '';
   for (let i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
   return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+/**
+ * Generates a JSON Web Token (JWT).
+ */
 async function makeJWT() {
   const header  = b64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const now     = Math.floor(Date.now() / 1000);
